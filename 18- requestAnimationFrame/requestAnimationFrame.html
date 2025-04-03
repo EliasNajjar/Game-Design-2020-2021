@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>
+            onClick
+        </title>
+        <script>
+            let cords = [];
+            let count = 0;
+            function main()
+            {                
+                console.log("hello");
+                
+                window.onclick = function (e)
+                {
+                    let x = e.clientX;
+                    let y = e.clientY;
+                    let c = new Cord(x, y);
+                    cords.push(c);
+                    hasClicked();
+                }
+                toRender();
+            }
+            function toRender()
+            {                
+                count++;
+                console.log(count);
+                let canvas = document.getElementById("screen");
+                let draw = canvas.getContext("2d");
+                draw.fillStyle = "#0000FF";
+                draw.fillRect(0,0, 800,800);
+                drawCords();
+                window.requestAnimationFrame(toRender);                
+            }
+            function drawCords()
+            {
+                let point1;
+                let point2;
+                let xywh;
+                let x;
+                let y;
+                let w;
+                let h;
+                for(let i = 0;i < cords.length - 1; i = i + 2)
+                {
+                    point1 = cords[i];
+                    point2 = cords[i + 1];
+                    xywh = findPoints(point1, point2);
+                    x = xywh[0];
+                    y = xywh[1];
+                    w = xywh[2];
+                    h = xywh[3];
+                    drawRectAnimated(x,y,w,h);//added
+                    //drawRect(x,y,w,h);
+                }
+            }
+            function hasClicked()
+            {
+                if((cords.length % 2) == 0 && cords.length != 0)
+                {
+                    let point1 = cords[cords.length - 2];
+                    let point2 = cords[cords.length - 1];
+                    /*
+                    let w = Math.abs(point1.x - point2.x);
+                    let h = Math.abs(point1.y - point2.y);
+                    let x = point1.x;
+                    let y = point1.y;
+                    */
+                    let xywh = findPoints(point1, point2);
+                    let x = xywh[0];
+                    let y = xywh[1];
+                    let w = xywh[2];
+                    let h = xywh[3];
+                    drawRect(x,y,w,h);           
+                }
+                
+            }
+            function findPoints(p1, p2)
+            {
+                let Xlargest;
+                let Ylargest;
+                let Xsmallest;
+                let Ysmallest;
+                if(p1.x > p2.x)
+                {
+                    Xlargest = p1.x;
+                    Xsmallest = p2.x;
+                }
+                else 
+                {
+                    Xlargest = p2.x;
+                    Xsmallest = p1.x;
+                }
+                if(p1.y > p2.y)
+                {
+                    Ylargest = p1.y;
+                    Ysmallest = p2.y;
+                }
+                else
+                {
+                    Ylargest = p2.y;
+                    Ysmallest = p1.y;
+                }
+                let width = Xlargest - Xsmallest;
+                let height = Ylargest - Ysmallest;
+                return [Xsmallest, Ysmallest, width, height];
+            }
+            class Cord
+            {                
+                constructor(x, y)
+                {
+                    this.x = x;
+                    this.y = y;
+                }
+            }
+            function drawRect(x, y, w, h)
+            {
+                let canvas = document.getElementById("screen");
+                let context2d = canvas.getContext("2d");
+                context2d.fillStyle = "#4FACE4";
+                context2d.fillRect(x,y,w,h);
+            }
+            function drawRectAnimated(x, y, w, h)
+            {
+                let canvas = document.getElementById("screen");
+                let context2d = canvas.getContext("2d");
+                let colors = ["#FF0000", "#008000", "#000000", "#FFFF00"];
+                let adjustedCount =  Math.floor(count / 50);
+
+
+                context2d.fillStyle = colors[(adjustedCount + 0) % colors.length];      
+                context2d.fillRect(x,y,w,h);
+
+                context2d.fillStyle = colors[(adjustedCount + 1) % colors.length];          
+                context2d.fillRect(x,y,w,h);
+
+                context2d.fillStyle = colors[(adjustedCount + 2) % colors.length];   
+                context2d.fillRect(x,y,w,h);
+            }
+        </script>
+    </head>
+    <body onload="main()">
+        <canvas id="screen" width="800" height="800"></canvas>
+    </body>
+</html>
